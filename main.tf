@@ -18,7 +18,7 @@ resource "aws_iam_role" "lambda_exec_role" {
 }
 
 resource "aws_iam_policy_attachment" "lambda_basic_execution" {
-  name       = "attach_lambda_basic"
+  name       = "attach_lambda_basic_${terraform.workspace}"
   roles      = [aws_iam_role.lambda_exec_role.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
