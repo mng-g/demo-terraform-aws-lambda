@@ -37,7 +37,7 @@ init: zip backend
 	@terraform init -input=false
 	@bash -c '\
 		if [ -n "$(ENV)" ]; then \
-			echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"; \
+			echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"; \
 		else \
 			if terraform workspace list | grep -q "$(ENV)"; then \
 				echo "✅ Selecting workspace $(ENV)"; \
@@ -53,21 +53,21 @@ init: zip backend
 .PHONY: plan
 plan:
 # 	terraform workspace select $(ENV)
-	@echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"
+	@echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"
 	terraform plan -var="project_name=$(TF_VAR_project_name)"
 
 # === APPLY ===
 .PHONY: apply
 apply:
 # 	terraform workspace select $(ENV)
-	@echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"
+	@echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"
 	terraform apply -var="project_name=$(TF_VAR_project_name)" -auto-approve
 
 # === DESTROY ===
 .PHONY: destroy
 destroy:
 # 	terraform workspace select $(ENV)
-	@echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"
+	@echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"
 	terraform destroy -var="project_name=$(TF_VAR_project_name)" -auto-approve
 
 # === CLEAN ===
