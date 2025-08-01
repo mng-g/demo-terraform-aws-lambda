@@ -33,11 +33,19 @@ zip:
 	cd $(LAMBDA_DIR) && zip -r ../$(ZIP_FILE) .
 
 # === INIT ===
-.PHONY: init
 init: zip backend
 	terraform init
-	@if [ -z "$$TF_WORKSPACE" ]; then \
-		terraform workspace select $(ENV) || terraform workspace new $(ENV); \
+	terraform workspace list
+	@if [ -n "$(ENV)" ]; then \
+		echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"; \
+	else \
+		if terraform workspace list | grep -q '$(ENV)'; then \
+			echo "✅ Selecting workspace $(ENV)"; \
+			terraform workspace select $(ENV); \
+		else \
+			echo "🆕 Creating workspace $(ENV)"; \
+			terraform workspace new $(ENV); \
+		fi; \
 	fi
 
 # === PLAN ===
