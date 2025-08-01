@@ -34,18 +34,20 @@ zip:
 
 # === INIT ===
 init: zip backend
-	terraform init -input=false \
-	@if [ -n "$(ENV)" ]; then \
-		echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"; \
-	else \
-		if terraform workspace list | grep -q '$(ENV)'; then \
-			echo "✅ Selecting workspace $(ENV)"; \
-			terraform workspace select $(ENV); \
+	@terraform init -input=false
+	@bash -c '\
+		if [ -n "$(ENV)" ]; then \
+			echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"; \
 		else \
-			echo "🆕 Creating workspace $(ENV)"; \
-			terraform workspace new $(ENV); \
-		fi; \
-	fi
+			if terraform workspace list | grep -q "$(ENV)"; then \
+				echo "✅ Selecting workspace $(ENV)"; \
+				terraform workspace select "$(ENV)"; \
+			else \
+				echo "🆕 Creating workspace $(ENV)"; \
+				terraform workspace new "$(ENV)"; \
+			fi; \
+		fi'
+
 
 # === PLAN ===
 .PHONY: plan
