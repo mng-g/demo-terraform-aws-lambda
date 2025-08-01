@@ -36,7 +36,9 @@ zip:
 .PHONY: init
 init: zip backend
 	terraform init
-	terraform workspace select $(ENV) || terraform workspace new $(ENV)
+	@if [ -z "$$TF_WORKSPACE" ]; then \
+		terraform workspace select $(ENV) || terraform workspace new $(ENV); \
+	fi
 
 # === PLAN ===
 .PHONY: plan
