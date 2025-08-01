@@ -38,20 +38,6 @@ init: zip backend
 	@echo "Initializing Terraform for environment: $(ENV)"
 	@terraform workspace select $(ENV) || terraform workspace new $(ENV)
 
-# 	@bash -c '\
-# 		if [ -n "$(ENV)" ]; then \
-# 			echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"; \
-# 		else \
-# 			if terraform workspace list | grep -q "$(ENV)"; then \
-# 				echo "✅ Selecting workspace $(ENV)"; \
-# 				terraform workspace select "$(ENV)"; \
-# 			else \
-# 				echo "🆕 Creating workspace $(ENV)"; \
-# 				terraform workspace new "$(ENV)"; \
-# 			fi; \
-# 		fi'
-
-
 # === PLAN ===
 .PHONY: plan
 plan:
