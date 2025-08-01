@@ -16,6 +16,8 @@ jobs:
     name: Deploy to ${{ github.ref_name }}
     runs-on: ubuntu-latest
 
+    environment: ${{ github.ref_name == 'main' && 'production' || '' }}
+
     permissions:
       id-token: write
       contents: read
@@ -70,9 +72,6 @@ jobs:
 
     - name: Terraform apply to prod (manual approval via environment)
       if: github.ref_name == 'main'
-      environment:
-        name: production
-        url: https://console.aws.amazon.com/lambda/home
       run: make apply ENV=prod
 
     - name: Test Lambda HTTP Endpoint
