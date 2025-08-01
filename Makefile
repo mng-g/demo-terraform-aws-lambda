@@ -35,10 +35,14 @@ zip:
 # === INIT ===
 .PHONY: init
 init: zip backend
-	terraform init
-	@if [ -z "$$TF_WORKSPACE" ]; then \
-		terraform workspace select $(ENV) || terraform workspace new $(ENV); \
+	@if ! terraform workspace list | grep -q '^\s*$(ENV)$$'; then \
+		echo "🆕 Creating workspace $(ENV)"; \
+		terraform workspace new $(ENV); \
+	else \
+		echo "✅ Selecting workspace $(ENV)"; \
+		terraform workspace select $(ENV); \
 	fi
+	terraform init
 
 # === PLAN ===
 .PHONY: plan
