@@ -43,19 +43,22 @@ init: zip backend
 # === PLAN ===
 .PHONY: plan
 plan:
-	terraform workspace select $(ENV)
+# 	terraform workspace select $(ENV)
+	@echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"
 	terraform plan -var="project_name=$(TF_VAR_project_name)"
 
 # === APPLY ===
 .PHONY: apply
 apply:
-	terraform workspace select $(ENV)
+# 	terraform workspace select $(ENV)
+	@echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"
 	terraform apply -var="project_name=$(TF_VAR_project_name)" -auto-approve
 
 # === DESTROY ===
 .PHONY: destroy
 destroy:
-	terraform workspace select $(ENV)
+# 	terraform workspace select $(ENV)
+	@echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"
 	terraform destroy -var="project_name=$(TF_VAR_project_name)" -auto-approve
 
 # === CLEAN ===
