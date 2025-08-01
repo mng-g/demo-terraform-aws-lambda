@@ -44,7 +44,7 @@ jobs:
 
     - name: Generate backend.tf
       run: |
-        make backend
+        make backend ENV=${{ github.ref_name }}
 
 
     - name: Set up Terraform
