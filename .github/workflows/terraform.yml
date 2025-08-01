@@ -41,6 +41,7 @@ jobs:
         echo "TF_BACKEND_BUCKET=${{ secrets.TF_BACKEND_BUCKET }}" >> $GITHUB_ENV
         echo "TF_BACKEND_REGION=${{ secrets.TF_BACKEND_REGION }}" >> $GITHUB_ENV
         echo "TF_BACKEND_DDB_TABLE=${{ secrets.TF_BACKEND_DDB_TABLE }}" >> $GITHUB_ENV
+        echo "TF_BACKEND_KEY=${{ secrets.TF_BACKEND_KEY }}" >> $GITHUB_ENV
 
     - name: Generate backend.tf
       run: |
