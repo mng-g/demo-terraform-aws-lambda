@@ -46,9 +46,9 @@ jobs:
         echo "TF_BACKEND_KEY=${{ secrets.TF_BACKEND_KEY }}" >> $GITHUB_ENV
 
         if [[ "${{ github.ref_name }}" == "main" ]]; then
-          echo "TF_WORKSPACE=prod" >> $GITHUB_ENV
+          echo "DEPLOY_ENVIRONMENT=prod" >> $GITHUB_ENV
         else
-          echo "TF_WORKSPACE=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "DEPLOY_ENVIRONMENT=${{ github.ref_name }}" >> $GITHUB_ENV
         fi
 
     - name: Generate backend.tf
@@ -61,7 +61,7 @@ jobs:
 
     - name: Terraform init
       run: |
-        make init ENV=${{ env.TF_WORKSPACE }}
+        make init ENV=${{ env.DEPLOY_ENVIRONMENT }}
 
     - name: Terraform format check
       run: terraform fmt -check
@@ -70,15 +70,15 @@ jobs:
       run: terraform validate
 
     - name: Terraform plan
-      run: make plan ENV=${{ env.TF_WORKSPACE }}
+      run: make plan ENV=${{ env.DEPLOY_ENVIRONMENT }}
 
     - name: Terraform apply (auto for dev/test)
       if: github.ref_name != 'main'
-      run: make apply ENV=${{ env.TF_WORKSPACE }}
+      run: make apply ENV=${{ env.DEPLOY_ENVIRONMENT }}
 
     - name: Terraform apply to prod (manual approval via environment)
       if: github.ref_name == 'main'
-      run: make apply ENV=${{ env.TF_WORKSPACE }}
+      run: make apply ENV=${{ env.DEPLOY_ENVIRONMENT }}
 
     - name: Test Lambda HTTP Endpoint
       run: |
