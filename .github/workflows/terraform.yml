@@ -45,10 +45,10 @@ jobs:
         echo "TF_BACKEND_DDB_TABLE=${{ secrets.TF_BACKEND_DDB_TABLE }}" >> $GITHUB_ENV
         echo "TF_BACKEND_KEY=${{ secrets.TF_BACKEND_KEY }}" >> $GITHUB_ENV
 
-        if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+        if [[ "${{ github.ref_name }}" == "main" ]]; then
           echo "TF_WORKSPACE=prod" >> $GITHUB_ENV
         else
-          echo "TF_WORKSPACE=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo "TF_WORKSPACE=${{ github.ref_name }}" >> $GITHUB_ENV
         fi
 
     - name: Generate backend.tf
