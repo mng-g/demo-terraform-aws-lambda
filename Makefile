@@ -36,12 +36,16 @@ zip:
 init: zip backend
 	terraform init
 	terraform workspace list
-	@if terraform workspace list | grep -q '$(ENV)'; then \
-		echo "✅ Selecting workspace $(ENV)"; \
-		terraform workspace select $(ENV); \
+	@if [ -n "$(ENV)" ]; then \
+		echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"; \
 	else \
-		echo "🆕 Creating workspace $(ENV)"; \
-		terraform workspace new $(ENV); \
+		if terraform workspace list | grep -q '$(ENV)'; then \
+			echo "✅ Selecting workspace $(ENV)"; \
+			terraform workspace select $(ENV); \
+		else \
+			echo "🆕 Creating workspace $(ENV)"; \
+			terraform workspace new $(ENV); \
+		fi; \
 	fi
 
 # === PLAN ===
