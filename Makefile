@@ -34,10 +34,9 @@ zip:
 
 # === INIT ===
 init: zip backend
-	unset TF_WORKSPACE
-	terraform init
-	export TF_WORKSPACE=$(ENV)
-	terraform workspace list
+	unset TF_WORKSPACE; \
+	terraform init -input=false; \
+	terraform workspace list; \
 	@if [ -n "$(ENV)" ]; then \
 		echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"; \
 	else \
