@@ -83,4 +83,20 @@ jobs:
     - name: Test Lambda HTTP Endpoint
       run: |
         API_URL=$(terraform output -raw api_url)
-        curl --fail "$API_URL/"
+
+        MAX_RETRIES=2
+        DELAY=5
+
+        for i in $(seq 0 $MAX_RETRIES); do
+          echo "Attempt $((i + 1)) to call $API_URL/"
+          if curl --fail "$API_URL/"; then
+            echo "✅ Success"
+            break
+          elif [ "$i" -lt "$MAX_RETRIES" ]; then
+            echo "❌ Failed. Retrying in $DELAY seconds..."
+            sleep $DELAY
+          else
+            echo "❌ Final attempt failed. Exiting with error."
+            exit 1
+          fi
+        done
