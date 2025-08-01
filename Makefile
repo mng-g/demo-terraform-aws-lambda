@@ -36,7 +36,7 @@ zip:
 .PHONY: init
 init: zip backend
 	terraform workspace select $(ENV) || terraform workspace new $(ENV)
-	terraform init -reconfigure
+	terraform init -migrate-state
 
 # === PLAN ===
 .PHONY: plan
