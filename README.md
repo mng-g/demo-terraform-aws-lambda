@@ -1,6 +1,6 @@
 # 🚀 demo-terraform-aws-lambda
 
-This project demonstrates how to deploy AWS Lambda functions using Terraform with a **remote backend** powered by **S3** and **DynamoDB** for secure, team-friendly state management.
+This project demonstrates how to deploy AWS Lambda functions using Terraform with a **remote backend** powered by **S3** and **DynamoDB** for secure, team-friendly state management. It supports **isolated workspaces** for `dev`, `test`, and `prod`.
 
 ---
 
@@ -8,7 +8,8 @@ This project demonstrates how to deploy AWS Lambda functions using Terraform wit
 
 - AWS CLI installed and configured
 - Terraform installed
-- AWS credentials with permissions to manage S3, DynamoDB, Lambda, IAM, etc.
+- Make installed (for using the Makefile)
+- AWS credentials with permissions to manage S3, DynamoDB, Lambda, IAM, API Gateway, etc.
 
 ---
 
@@ -30,7 +31,7 @@ export TF_BACKEND_REGION="us-east-1"
 # DynamoDB table for state locking
 export TF_BACKEND_DDB_TABLE="terraform-locks"
 
-# Key (path) to the Terraform state file in S3
+# Key (path) to the Terraform state file in S3.
 export TF_BACKEND_KEY="lambda_project/terraform.tfstate"
 ````
 
@@ -60,27 +61,39 @@ aws dynamodb create-table \
 
 ---
 
-## 🔧 Generate `backend.tf` Dynamically
+## ▶️ Workspace-based Environment Management
 
-This project includes a script to generate your `backend.tf` file using the environment variables you defined.
+This project uses **Terraform workspaces** to manage `dev`, `test`, and `prod`.
 
-### ▶️ Run the backend.tf generator
+---
+
+## 🛠️ Makefile Usage
 
 ```bash
-chmod +x generate-backend.sh
-./generate-backend.sh
+# Initialize environment (create workspace if it doesn’t exist)
+make init ENV=dev
+
+# Plan infrastructure changes
+make plan ENV=dev
+
+# Apply infrastructure
+make apply ENV=dev
+
+# Destroy resources
+make destroy ENV=dev
+
+# Clean zip file
+make clean
 ```
 
 ---
 
-## 🚀 Terraform Workflow
+## 🔧 Lambda Output
 
-```bash
-cd demo-terraform-aws-lambda
+Each Lambda function will print the environment it's running in (e.g., `dev`, `test`, `prod`):
 
-terraform init
-terraform plan
-terraform apply
+```python
+Hello from Lambda in 'dev' environment!
 ```
 
 ---
@@ -100,7 +113,7 @@ aws dynamodb describe-table --table-name "$TF_BACKEND_DDB_TABLE"
 ### Destroy Terraform-managed infrastructure
 
 ```bash
-terraform destroy
+make destroy ENV=dev
 ```
 
 ### Remove backend resources manually (⚠️ irreversible)
@@ -114,10 +127,9 @@ aws dynamodb delete-table --table-name "$TF_BACKEND_DDB_TABLE"
 
 ## 💡 Best Practices
 
+* ✅ Use Terraform workspaces for true environment separation
 * ✅ Commit `.terraform.lock.hcl` to lock provider versions
-* ❌ Do **not** commit `.terraform/`, `.tfstate`, or build artifacts like `lambda.zip`
+* ❌ Do **not** commit `.terraform/`, `.tfstate`, or `lambda.zip`
 * 🧪 Run `terraform fmt` and `terraform validate` before each commit
 * 🔒 Enable logging and monitoring (e.g., CloudWatch) for production Lambda functions
-* 📦 Separate environments by using different keys (e.g., `envs/dev/terraform.tfstate`)
-
----
+* 🔁 Add GitHub Actions for CI/CD automation

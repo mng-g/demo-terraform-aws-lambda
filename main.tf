@@ -24,7 +24,7 @@ resource "aws_iam_policy_attachment" "lambda_basic_execution" {
 }
 
 resource "aws_s3_bucket" "lambda_code" {
-  bucket = "${var.project_name}-lambda-code"
+  bucket        = "${var.project_name}-${terraform.workspace}-lambda-code"
   force_destroy = true
 }
 
@@ -42,7 +42,7 @@ data "archive_file" "lambda_zip" {
 }
 
 resource "aws_lambda_function" "example_lambda" {
-  function_name = "example_lambda"
+  function_name = "example_lambda_${terraform.workspace}"
   runtime       = "python3.11"
   handler       = "handler.lambda_handler"
   role          = aws_iam_role.lambda_exec_role.arn
@@ -52,6 +52,12 @@ resource "aws_lambda_function" "example_lambda" {
 
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   timeout          = 10
+
+  environment {
+    variables = {
+      ENV = terraform.workspace
+    }
+  }
 }
 
 // API Gateway configuration
