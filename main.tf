@@ -15,10 +15,16 @@ resource "aws_iam_role" "lambda_exec_role" {
       }
     ]
   })
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy       = true
+    ignore_changes        = [name]
+  }
 }
 
 resource "aws_iam_policy_attachment" "lambda_basic_execution" {
-  name       = "attach_lambda_basic"
+  name       = "attach_lambda_basic_${terraform.workspace}"
   roles      = [aws_iam_role.lambda_exec_role.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
@@ -41,6 +47,7 @@ data "archive_file" "lambda_zip" {
   output_path = "${path.module}/lambda.zip"
 }
 
+# Lambda function configuration
 resource "aws_lambda_function" "example_lambda" {
   function_name = "example_lambda_${terraform.workspace}"
   runtime       = "python3.11"

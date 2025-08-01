@@ -33,32 +33,44 @@ zip:
 	cd $(LAMBDA_DIR) && zip -r ../$(ZIP_FILE) .
 
 # === INIT ===
-.PHONY: init
 init: zip backend
-	terraform init
-	@if [ -z "$$TF_WORKSPACE" ]; then \
-		terraform workspace select $(ENV) || terraform workspace new $(ENV); \
-	fi
+	@terraform init -input=false
+	@echo "Initializing Terraform for environment: $(ENV)"
+	@terraform workspace select $(ENV) || terraform workspace new $(ENV)
+
+# 	@bash -c '\
+# 		if [ -n "$(ENV)" ]; then \
+# 			echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"; \
+# 		else \
+# 			if terraform workspace list | grep -q "$(ENV)"; then \
+# 				echo "✅ Selecting workspace $(ENV)"; \
+# 				terraform workspace select "$(ENV)"; \
+# 			else \
+# 				echo "🆕 Creating workspace $(ENV)"; \
+# 				terraform workspace new "$(ENV)"; \
+# 			fi; \
+# 		fi'
+
 
 # === PLAN ===
 .PHONY: plan
 plan:
 # 	terraform workspace select $(ENV)
-	@echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"
+	@echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"
 	terraform plan -var="project_name=$(TF_VAR_project_name)"
 
 # === APPLY ===
 .PHONY: apply
 apply:
 # 	terraform workspace select $(ENV)
-	@echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"
+	@echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"
 	terraform apply -var="project_name=$(TF_VAR_project_name)" -auto-approve
 
 # === DESTROY ===
 .PHONY: destroy
 destroy:
 # 	terraform workspace select $(ENV)
-	@echo "Terraform workspace: $${TF_WORKSPACE:-$(ENV)}"
+	@echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"
 	terraform destroy -var="project_name=$(TF_VAR_project_name)" -auto-approve
 
 # === CLEAN ===
