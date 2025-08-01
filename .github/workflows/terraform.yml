@@ -1,0 +1,84 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches:
+      - dev
+      - test
+      - main
+
+env:
+  AWS_REGION: us-east-1
+  TF_VAR_project_name: demo-terraform-aws-lambda
+
+jobs:
+  terraform:
+    name: Deploy to ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python (for Lambda packaging)
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Set environment variables
+      run: |
+        echo "TF_BACKEND_BUCKET=${{ secrets.TF_BACKEND_BUCKET }}" >> $GITHUB_ENV
+        echo "TF_BACKEND_REGION=${{ secrets.TF_BACKEND_REGION }}" >> $GITHUB_ENV
+        echo "TF_BACKEND_DDB_TABLE=${{ secrets.TF_BACKEND_DDB_TABLE }}" >> $GITHUB_ENV
+        echo "TF_BACKEND_KEY=${{ secrets.TF_BACKEND_KEY }}" >> $GITHUB_ENV
+
+    - name: Generate backend.tf
+      run: |
+        make backend ENV=${{ github.ref_name }}
+
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform init
+      run: |
+        make init ENV=${{ github.ref_name }}
+
+    - name: Terraform format check
+      run: terraform fmt -check
+
+    - name: Terraform validate
+      run: terraform validate
+
+    - name: Terraform plan
+      run: make plan ENV=${{ github.ref_name }}
+
+    - name: Terraform apply (auto for dev/test, manual for prod)
+      if: github.ref_name != 'main'
+      run: make apply ENV=${{ github.ref_name }}
+
+    - name: Manual approval for prod
+      if: github.ref_name == 'main'
+      uses: hmarr/auto-approve-action@v3
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Terraform apply to prod (only after manual approval)
+      if: github.ref_name == 'main'
+      run: make apply ENV=${{ github.ref_name }}
+
+    - name: Test Lambda HTTP Endpoint
+      run: |
+        API_URL=$(terraform output -raw api_url)
+        curl --fail "$API_URL/"
