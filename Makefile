@@ -35,12 +35,13 @@ zip:
 # === INIT ===
 init: zip backend
 	terraform init
-	@if terraform workspace list | grep -q '^\s*$(ENV)$$'; then \
+	terraform workspace list
+	@if terraform workspace list | grep -q '$(ENV)'; then \
 		echo "✅ Selecting workspace $(ENV)"; \
 		terraform workspace select $(ENV); \
 	else \
 		echo "🆕 Creating workspace $(ENV)"; \
-		terraform workspace new $(ENV) || echo "⚠️ Workspace already exists"; \
+		terraform workspace new $(ENV); \
 	fi
 
 # === PLAN ===
