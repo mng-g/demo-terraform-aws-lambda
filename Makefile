@@ -1,6 +1,6 @@
 # === CONFIGURATION ===
 TF_PROJECT         := demo-terraform-aws-lambda
-LAMBDA_DIR         := lambda
+LAMBDA_DIR         := src
 ZIP_FILE           := lambda.zip
 WORKSPACES         := dev test prod
 TF_VAR_project_name := demo-terraform-aws-lambda

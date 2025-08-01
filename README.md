@@ -70,6 +70,9 @@ This project uses **Terraform workspaces** to manage `dev`, `test`, and `prod`.
 ## 🛠️ Makefile Usage
 
 ```bash
+# Generate backend.tf file
+make backend
+
 # Initialize environment (create workspace if it doesn’t exist)
 make init ENV=dev
 
@@ -84,6 +87,16 @@ make destroy ENV=dev
 
 # Clean zip file
 make clean
+```
+
+---
+
+## 🧪 Test Your Deployed API
+
+After applying Terraform:
+
+```bash
+curl "$(terraform output -raw api_url)/"
 ```
 
 ---
