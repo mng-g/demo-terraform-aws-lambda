@@ -16,11 +16,11 @@ resource "aws_iam_role" "lambda_exec_role" {
     ]
   })
 
-  lifecycle {
-    create_before_destroy = true
-    prevent_destroy       = true
-    ignore_changes        = [name]
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  #   prevent_destroy       = true
+  #   ignore_changes        = [name]
+  # }
 }
 
 resource "aws_iam_policy_attachment" "lambda_basic_execution" {
@@ -63,6 +63,8 @@ resource "aws_lambda_function" "example_lambda" {
   environment {
     variables = {
       ENV = terraform.workspace
+      S3_BUCKET = "${var.project_name}-${terraform.workspace}-lambda-code"
+      DB_DSN = "postgresql://postgres:postgres@localhost:5432/postgres"
     }
   }
 }
@@ -83,7 +85,8 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
 
 resource "aws_apigatewayv2_route" "lambda_route" {
   api_id    = aws_apigatewayv2_api.http_api.id
-  route_key = "GET /"
+  #route_key = "GET /"
+  route_key = "ANY /{proxy+}" # catch-all route
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 

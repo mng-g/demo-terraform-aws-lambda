@@ -93,20 +93,55 @@ make clean
 
 ## 🧪 Test Your Deployed API
 
-After applying Terraform:
+After applying Terraform, you can test the Lambda API endpoints:
 
 ```bash
-curl "$(terraform output -raw api_url)/"
+# Health check
+curl "$(terraform output -raw api_url)/healthz"
+
+# S3 test
+curl "$(terraform output -raw api_url)/api/s3-test"
+
+# RDS test
+curl "$(terraform output -raw api_url)/api/rds-test"
 ```
 
 ---
 
 ## 🔧 Lambda Output
 
-Each Lambda function will print the environment it's running in (e.g., `dev`, `test`, `prod`):
+Each Lambda endpoint returns a JSON response. Example outputs:
 
-```python
-Hello from Lambda in 'dev' environment!
+### Health check
+```json
+{"status": "ok"}
+```
+
+### S3 test
+```json
+{
+  "bucket": "your-bucket-name",
+  "success": true,
+  "files": ["file1.txt", "file2.txt"],
+  "error": null
+}
+```
+
+### RDS test
+```json
+{
+  "success": true,
+  "db_version": "PostgreSQL 14.5 on ...",
+  "error": null
+}
+```
+
+If there is an error (missing env, connection failure, etc), the output will look like:
+```json
+{
+  "success": false,
+  "error": "...error message..."
+}
 ```
 
 ---
@@ -118,6 +153,23 @@ aws s3api list-buckets
 aws dynamodb list-tables
 aws dynamodb describe-table --table-name "$TF_BACKEND_DDB_TABLE"
 ```
+
+---
+
+## ⚠️ Note on psycopg2-binary for Lambda
+
+To use the `psycopg2-binary` library with AWS Lambda (Python 3.11), you must build it in an environment compatible with Lambda's Amazon Linux OS. The following Docker command was used to build the dependency in the correct format:
+
+```bash
+docker run --rm -v "$PWD/src":/var/task amazonlinux:2023 /bin/bash -c "
+  yum install -y python3.11 python3.11-devel gcc postgresql-devel &&
+  python3.11 -m ensurepip &&
+  python3.11 -m pip install --upgrade pip &&
+  python3.11 -m pip install psycopg2-binary -t /var/task
+"
+```
+
+This ensures that the Lambda deployment package contains a version of `psycopg2-binary` that works on AWS Lambda Python 3.11 runtimes.
 
 ---
 
