@@ -77,13 +77,13 @@ make backend
 make init ENV=dev
 
 # Plan infrastructure changes
-make plan ENV=dev
+make plan ENV=dev TF_VAR_project_name=<your_project_name> TF_VAR_s3_bucket=<your_s3_bucket> TF_VAR_db_dsn=<your_db_dsn>
 
 # Apply infrastructure
-make apply ENV=dev
+make apply ENV=dev TF_VAR_project_name=<your_project_name> TF_VAR_s3_bucket=<your_s3_bucket> TF_VAR_db_dsn=<your_db_dsn>
 
 # Destroy resources
-make destroy ENV=dev
+make destroy ENV=dev TF_VAR_project_name=<your_project_name> TF_VAR_s3_bucket=<your_s3_bucket> TF_VAR_db_dsn=<your_db_dsn>
 
 # Clean zip file
 make clean

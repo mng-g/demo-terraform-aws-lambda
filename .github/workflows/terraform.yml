@@ -44,6 +44,8 @@ jobs:
         echo "TF_BACKEND_REGION=${{ secrets.TF_BACKEND_REGION }}" >> $GITHUB_ENV
         echo "TF_BACKEND_DDB_TABLE=${{ secrets.TF_BACKEND_DDB_TABLE }}" >> $GITHUB_ENV
         echo "TF_BACKEND_KEY=${{ secrets.TF_BACKEND_KEY }}" >> $GITHUB_ENV
+        echo "TF_VAR_s3_bucket=${{ secrets.TF_VAR_s3_bucket }}" >> $GITHUB_ENV
+        echo "TF_VAR_db_dsn=${{ secrets.TF_VAR_db_dsn }}" >> $GITHUB_ENV
 
         if [[ "${{ github.ref_name }}" == "main" ]]; then
           echo "DEPLOY_ENVIRONMENT=prod" >> $GITHUB_ENV

@@ -43,21 +43,21 @@ init: zip backend
 plan:
 # 	terraform workspace select $(ENV)
 	@echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"
-	terraform plan -var="project_name=$(TF_VAR_project_name)"
+	terraform plan -var="project_name=$(TF_VAR_project_name)" -var="s3_bucket=$(TF_VAR_s3_bucket)" -var="db_dsn=$(TF_VAR_db_dsn)"
 
 # === APPLY ===
 .PHONY: apply
 apply:
 # 	terraform workspace select $(ENV)
 	@echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"
-	terraform apply -var="project_name=$(TF_VAR_project_name)" -auto-approve
+	terraform apply -var="project_name=$(TF_VAR_project_name)" -var="s3_bucket=$(TF_VAR_s3_bucket)" -var="db_dsn=$(TF_VAR_db_dsn)" -auto-approve
 
 # === DESTROY ===
 .PHONY: destroy
 destroy:
 # 	terraform workspace select $(ENV)
 	@echo "Terraform workspace: $${DEPLOY_ENVIRONMENT:-$(ENV)}"
-	terraform destroy -var="project_name=$(TF_VAR_project_name)" -auto-approve
+	terraform destroy -var="project_name=$(TF_VAR_project_name)" -var="s3_bucket=$(TF_VAR_s3_bucket)" -var="db_dsn=$(TF_VAR_db_dsn)" -auto-approve
 
 # === CLEAN ===
 .PHONY: clean

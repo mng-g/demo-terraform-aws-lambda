@@ -63,8 +63,8 @@ resource "aws_lambda_function" "example_lambda" {
   environment {
     variables = {
       ENV       = terraform.workspace
-      S3_BUCKET = "${var.project_name}-${terraform.workspace}-lambda-code"
-      DB_DSN    = "postgresql://postgres:postgres@localhost:5432/postgres"
+      S3_BUCKET = var.s3_bucket
+      DB_DSN    = var.db_dsn
     }
   }
 }
